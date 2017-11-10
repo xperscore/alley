@@ -1,0 +1,6 @@
+*.pyc
+__pycache__
+.eggs
+flask_mongoengine_migrations.egg-info
+.cache
+.coverage

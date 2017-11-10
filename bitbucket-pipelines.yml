@@ -1,0 +1,7 @@
+image: python:3
+
+pipelines:
+  default:
+    - step:
+        script: 
+          - python setup.py test
