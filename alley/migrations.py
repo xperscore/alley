@@ -1,11 +1,11 @@
+import imp
 import os
 import re
 from datetime import datetime
-from importlib.util import spec_from_file_location, module_from_spec
 
-import structlog
+from structlog import get_logger
 
-logger = structlog.get_logger(__name__)
+logger = get_logger()
 
 
 class MigrationFile(object):
@@ -42,7 +42,7 @@ class MigrationFile(object):
 class Migrations(object):
     """Manage MongoDB migrations."""
 
-    MIGRATIONS_COLLECTION = 'migrations'
+    MIGRATIONS_COLLECTION = 'db_migrations'
     MIGRATIONS_DIRECTORY = 'migrations'
     NO_MIGRATIONS_MSG = 'All migrations registered, nothing to execute'
 
@@ -109,9 +109,10 @@ class Migrations(object):
     def load_migration_file(self, filename):
         """Load migration file as module."""
         path = os.path.join(self.directory, filename)
-        spec = spec_from_file_location("migration", path)
-        module = module_from_spec(spec)
-        spec.loader.exec_module(module)
+        # spec = spec_from_file_location("migration", path)
+        # module = module_from_spec(spec)
+        # spec.loader.exec_module(module)
+        module = imp.load_source("migration", path)
         return module
 
     def get_migrations_to_up(self, migration_id=None):

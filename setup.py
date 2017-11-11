@@ -1,33 +1,37 @@
 """
-Flask-MongoEnginge-Migrations
+Alley
 -------------
 
-Flask-MongoEngine-Migrations is a Flask extension
-that provides posibility to create migrations for MongoDB.
+Alley is a framework-agnostic migration helper for MongoDB.
 """
+
 from setuptools import setup
 
 
 setup(
-    name='flask-mongoengine-migrations',
-    version='0.2.1',
-    url='https://bitbucket.org/letsignitcloud/flask-mongoengine-migrations',
+    name='alley',
+    version='0.0.1',
+    url='https://github.com/xperscore/alley',
     license='BSD',
-    author='Andrey Zhukov',
-    author_email='azhukov@mailinblack.com',
-    description='Flask extension for MongoDB migrations',
+    author='Zach Layng',
+    author_email='zach@whoknows.com',
+    description='Framework agnostic MongoEngine migrations.',
     long_description=__doc__,
-    packages=['flask_mongoengine_migrations'],
+    packages=['alley'],
     include_package_data=True,
     platforms='any',
-    python_requires='>=3.5',
+    python_requires='>=2.7',
     install_requires=[
-        'Flask>=0.11',
-        'flask-mongoengine>=0.8.2',
-        'structlog>=16.0.0'
+        'mongoengine>=0.9.0'
+        'structlog[dev]',
+        'click'
     ],
     setup_requires=['pytest-runner'],
-    tests_require=['pytest-cov', 'pytest'],
+    tests_require=['pytest-cov', 'pytest', 'mock'],
+    entry_points='''
+        [console_scripts]
+        alley=alley.alley_cli:cli
+    ''',
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',

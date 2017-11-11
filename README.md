@@ -1,52 +1,57 @@
-# Flask MongoEngine Migrations
+# MongoEngine Migrations
 
 ## About
 
-The applicaiton allows to create, execute and rollback migrations for MongoDB.
-The migration files stored in `<application>/migrations` directory.
+The applicaiton allows you to create, execute and rollback migrations for MongoDB.
+The migration files stored in a specified `migrations` directory.
 Each file contains up and down python methods.
-After execution the record about migration is added to `migrations` mongo collection.
+After execution a record about migration is added to `db_migrations` mongo collection.
+
+This package is a fork of https://bitbucket.org/letsignitcloud/flask-mongoengine-migrations by Andrey Zhukov.
 
 
 ## Usage
 
 ### Create migration
 
-    FLASK_APP=app.py flask migration_create <name>
+    alley <PATH to migrations directory> create <name>
 
 Creates migration file `<id>_<name>.py` with empty up and down methods.
 
 
 ### Show status
 
-    FLASK_APP=app.py flask migration_status
+    alley <PATH> status
 
 Show migrations available for execution.
 
 
 ### Run migration
 
-    FLASK_APP=app.py flask migration_up
+    alley <PATH> up [migration_id]
+    
 
-#### To specific migration
+Save migration as having been run, but skip execution:
 
-    FLASK_APP=app.py flask migration_up <migration_id>
-
-
-#### Register migration, but skip execution
-
-    FLASK_APP=app.py flask migration_up --fake
+    alley <PATH> up [migration_id] --fake
 
 
 ### Rollback migration
 
-    FLASK_APP=app.py flask migration_down <migration_id>
+    alley <PATH> down <migration_id>
 
+ 
+### Connecting to MongoDB
+Before the `<PATH>` parameter, you'll need to specify your mongo connection.
+    
+    alley -db <database name> -u <user> -w <password> -a <authentication database> -h <host> -p <port> <PATH> <command>
+    
+    
+----
 
-## Test
+To see all available command line options run:
 
-    python setup.py test
-
+    alley --help
 
 ## Examples
 
@@ -54,8 +59,21 @@ Show migrations available for execution.
 
 ```
 def up(db):
-    db['some_collection'].update_many(
+    db['your_collection'].update_many(
         {'some_field': {'$exists': True}},
         {'$unset': {'some_field': 1}}
     )
 ```
+
+    
+    
+
+## Tests
+
+    python setup.py test
+    
+    
+## Todo:
+
+- Other ways to set mongo connection parameters.
+- Auto-detect migration directory. 

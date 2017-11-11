@@ -1,6 +1,6 @@
 from unittest import TestCase
-from unittest.mock import call, patch, MagicMock
-from flask_mongoengine_migrations.migrations import MigrationFile, Migrations
+from mock import call, patch, MagicMock
+from alley.migrations import MigrationFile, Migrations
 
 
 def get_migrations(from_id, to_id=None):
@@ -43,7 +43,7 @@ class MigrationFileTests(TestCase):
 class MigrationTests(TestCase):
 
     def test_init(self):
-        migrations = Migrations('/path', {'migrations': 'test'})
+        migrations = Migrations('/path', {'db_migrations': 'test'})
 
         self.assertEqual(migrations.directory, '/path/migrations')
         self.assertEqual(migrations.collection, 'test')
@@ -101,14 +101,11 @@ class MigrationTests(TestCase):
             '0003_new_migration.py',
             migrations.get_new_filename('new migration'))
 
-    @patch('flask_mongoengine_migrations.migrations.spec_from_file_location')
-    @patch('flask_mongoengine_migrations.migrations.module_from_spec')
-    def test_load_migration_file(self, mock_module, mock_spec):
+    @patch('imp.load_source')
+    def test_load_migration_file(self, mock_module):
         migrations = MockMigrations()
         migrations.load_migration_file('test')
-        mock_spec.assert_called_once_with(
-            'migration', 'migrations/test')
-        mock_module.assert_called_once_with(mock_spec())
+        mock_module.assert_called_once_with('migration', 'migrations/test')
 
 
 class ShowStatusTests(TestCase):
@@ -117,7 +114,7 @@ class ShowStatusTests(TestCase):
         self.migrations = MockMigrations()
         self.migrations.check_directory = MagicMock(return_value=True)
 
-    @patch('flask_mongoengine_migrations.migrations.logger')
+    @patch('alley.migrations.logger')
     def test_no_migrations(self, mock_logger):
         self.migrations.get_unregistered_migrations = MagicMock(
             return_value=[])
@@ -126,7 +123,7 @@ class ShowStatusTests(TestCase):
         mock_logger.info.assert_called_once_with(
             MockMigrations.NO_MIGRATIONS_MSG)
 
-    @patch('flask_mongoengine_migrations.migrations.logger')
+    @patch('alley.migrations.logger')
     def test_show_migrations(self, mock_logger):
         unregistered_migrations = get_migrations(2, 3)
         self.migrations.get_unregistered_migrations = MagicMock(
@@ -144,7 +141,7 @@ class CreateTests(TestCase):
 
     @patch('os.makedirs')
     @patch('os.path.exists', return_value=False)
-    @patch('builtins.open')
+    @patch('__builtin__.open')
     def test_create_direcrory(self, mock_open, mock_exists, mock_makedirs):
         self.migrations.create('test')
 
@@ -152,7 +149,7 @@ class CreateTests(TestCase):
 
     @patch('os.makedirs')
     @patch('os.path.exists', return_value=True)
-    @patch('builtins.open')
+    @patch('__builtin__.open')
     def test_write_file(self, mock_open, mock_exists, mock_makedirs):
         mock_open.return_value = MagicMock()
         self.migrations.create('test')
