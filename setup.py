@@ -13,8 +13,8 @@ setup(
     version='0.0.1',
     url='https://github.com/xperscore/alley',
     license='BSD',
-    author='Zach Layng',
-    author_email='zach@whoknows.com',
+    author='WhoKnows, Inc.',
+    author_email='dev@whoknows.com',
     description='Framework agnostic MongoEngine migrations.',
     long_description=__doc__,
     packages=['alley'],
@@ -22,8 +22,9 @@ setup(
     platforms='any',
     python_requires='>=2.7',
     install_requires=[
-        'mongoengine>=0.9.0'
-        'structlog[dev]',
+        'mongoengine>=0.9.0',
+        'structlog>17.1.0',
+        'colorama',
         'click'
     ],
     setup_requires=['pytest-runner'],

@@ -70,7 +70,7 @@ class Migrations(object):
         """Check if migrations directory exists."""
         exists = os.path.exists(self.directory)
         if not exists:
-            logger.error(error="No migrations directory",
+            logger.error(error="No migrations directory found. Check your path or create a migration first.",
                          directory=self.directory)
         return exists
 
