@@ -131,7 +131,7 @@ class ShowStatusTests(TestCase):
 
         self.migrations.show_status()
         mock_logger.info.assert_has_calls(
-            call(migration=m.filename) for m in unregistered_migrations)
+            [call("Unregistered migrations:")] + [call(m.filename) for m in unregistered_migrations])
 
 
 class CreateTests(TestCase):

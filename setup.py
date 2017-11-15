@@ -10,7 +10,7 @@ from setuptools import setup
 
 setup(
     name='alley',
-    version='0.0.1',
+    version='0.0.2',
     url='https://github.com/xperscore/alley',
     license='BSD',
     author='WhoKnows, Inc.',
@@ -23,8 +23,6 @@ setup(
     python_requires='>=2.7',
     install_requires=[
         'mongoengine>=0.9.0',
-        'structlog>17.1.0',
-        'colorama',
         'click'
     ],
     setup_requires=['pytest-runner'],

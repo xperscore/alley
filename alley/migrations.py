@@ -1,11 +1,10 @@
 import imp
+import logging
 import os
 import re
 from datetime import datetime
 
-from structlog import get_logger
-
-logger = get_logger()
+logger = logging.getLogger(__name__)
 
 
 class MigrationFile(object):
@@ -30,7 +29,7 @@ class MigrationFile(object):
         try:
             return int(migration_id)
         except ValueError:
-            logger.error(error='Invalid migration_id', id=migration_id)
+            logger.error('Invalid migration_id %s ' % migration_id)
 
     def as_dict(self):
         return {
@@ -70,8 +69,8 @@ class Migrations(object):
         """Check if migrations directory exists."""
         exists = os.path.exists(self.directory)
         if not exists:
-            logger.error(error="No migrations directory found. Check your path or create a migration first.",
-                         directory=self.directory)
+            logger.error("No migrations directory found. Check your path or create a migration first.")
+            logger.error("Directory: %s" % self.directory)
         return exists
 
     def show_status(self):
@@ -83,7 +82,7 @@ class Migrations(object):
         if migrations:
             logger.info('Unregistered migrations:')
             for migration in migrations:
-                logger.info(migration=migration.filename)
+                logger.info(migration.filename)
         else:
             logger.info(self.NO_MIGRATIONS_MSG)
 
@@ -104,7 +103,7 @@ class Migrations(object):
         with open(os.path.join(self.directory, filename), 'w') as fp:
             fp.write("def up(db): pass\n\n\n")
             fp.write("def down(db): pass\n")
-            logger.info(migration=filename)
+            logger.info(filename)
 
     def load_migration_file(self, filename):
         """Load migration file as module."""
@@ -132,8 +131,8 @@ class Migrations(object):
                 last_migration = [m for m in migrations
                                   if m.id == migration_id][0]
             except IndexError:
-                logger.error(error='Migration is not in unregistered list',
-                             id=migration_id)
+                logger.error('Migration is not in unregistered list: %s'
+                             % migration_id)
                 self.show_status()
                 return []
         else:
@@ -147,15 +146,14 @@ class Migrations(object):
             return
 
         for migration in self.get_migrations_to_up(migration_id):
-            log = logger.bind(migration=migration.filename)
-            log.info('Executing migration...')
+            logger.info('Executing migration: %s' % migration.filename)
 
             migration_module = self.load_migration_file(migration.filename)
             if not fake:
                 if hasattr(migration_module, 'up'):
                     migration_module.up(self.db)
                 else:
-                    log.error(error='No up method')
+                    logger.error('No up method on migration %s' % migration.filename)
 
             record = migration.as_dict()
             record['date'] = datetime.utcnow()
@@ -175,13 +173,13 @@ class Migrations(object):
         last_migration_id = self.get_last_migrated_id()
 
         if migration_id in (m.id for m in self.get_unregistered_migrations()):
-            logger.error(error='Migration is not applied', id=migration_id)
+            logger.error('Migration is not applied %s' % migration_id)
             return []
 
         try:
             migration = [m for m in migrations if m.id == migration_id][0]
         except IndexError:
-            logger.error(error='Migration does not exists', id=migration_id)
+            logger.error('Migration does not exists %s' % migration_id)
             return []
 
         return list(reversed([m for m in migrations
@@ -193,13 +191,12 @@ class Migrations(object):
             return
 
         for migration in self.get_migrations_to_down(migration_id):
-            log = logger.bind(migration=migration.filename)
-            log.info('Rollback migration...')
+            logger.info('Rollback migration %s' % migration.filename)
 
             migration_module = self.load_migration_file(migration.filename)
             if hasattr(migration_module, 'down'):
                 migration_module.down(self.db)
             else:
-                log.info('No down method')
+                logger.info('No down method on %s' % migration.filename)
 
             self.collection.remove({'filename': migration.filename})
