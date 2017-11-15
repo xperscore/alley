@@ -1,3 +1,5 @@
+import logging
+
 import click
 
 from alley import MongoMigrations
@@ -13,6 +15,7 @@ from alley import MongoMigrations
 @click.option('--auth', '-a')
 @click.pass_context
 def cli(ctx, path, database, username, password, host=None, port=None, auth=None):
+    logging.getLogger("alley.migrations").addHandler(logging.StreamHandler())
     ctx.obj = MongoMigrations(path, database, username, password, host=host, port=port, auth=auth)
 
 
