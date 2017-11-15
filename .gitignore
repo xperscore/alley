@@ -5,3 +5,4 @@ alley.egg-info
 .cache
 .coverage
 migrations
+dist

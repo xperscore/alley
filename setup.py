@@ -4,13 +4,15 @@ Alley
 
 Alley is a framework-agnostic migration helper for MongoDB.
 """
-
+import sys
 from setuptools import setup
 
+needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
+pytest_runner = ['pytest-runner'] if needs_pytest else []
 
 setup(
     name='alley',
-    version='0.0.2',
+    version='0.0.3',
     url='https://github.com/xperscore/alley',
     license='BSD',
     author='WhoKnows, Inc.',
@@ -25,7 +27,7 @@ setup(
         'mongoengine>=0.9.0',
         'click'
     ],
-    setup_requires=['pytest-runner'],
+    setup_requires=pytest_runner,
     tests_require=['pytest-cov', 'pytest', 'mock'],
     entry_points='''
         [console_scripts]
